@@ -1,7 +1,1372 @@
 {
-  "status": "error",
-  "message": "No static resource .",
-  "errors": [],
-  "correlationId": "d3347eae-6104-4f00-982b-b0ca8666acd3",
-  "timestamp": "2026-11-20T15:09:59.531771425Z"
+  "openapi": "3.0.1",
+  "info": {
+    "title": "Dispatch Load Balancer API",
+    "description": "Assigns delivery orders to a fleet of vehicles respecting **capacity** and **priority** (HIGH, MEDIUM, LOW) while minimizing travel distance (Haversine).\n\n**Typical flow:** 1) `POST /orders`  2) `POST /vehicles`  3) `GET /plan` (or `POST /plans` to save it, then `GET /plans/{id}/summary` for KPIs).\n\nOrders that cannot be placed are returned in `unassignedOrders` with a reason. Every path is also served under the assignment's original `/api/dispatch` prefix. Responses carry an `X-Correlation-Id` header that also appears in error bodies.",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://dispatch-load-balancer-q6wh.onrender.com",
+      "description": "Generated server url"
+    }
+  ],
+  "paths": {
+    "/api/v1/dispatch/vehicles/{vehicleId}": {
+      "get": {
+        "tags": [
+          "Fleet"
+        ],
+        "summary": "Get one vehicle",
+        "operationId": "getVehicle",
+        "parameters": [
+          {
+            "name": "vehicleId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/VehicleDto"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Fleet"
+        ],
+        "summary": "Replace an existing vehicle",
+        "operationId": "replaceVehicle",
+        "parameters": [
+          {
+            "name": "vehicleId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VehicleRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/VehicleDto"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Fleet"
+        ],
+        "summary": "Delete one vehicle",
+        "operationId": "deleteVehicle",
+        "parameters": [
+          {
+            "name": "vehicleId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Fleet"
+        ],
+        "summary": "Partially update a vehicle",
+        "operationId": "patchVehicle",
+        "parameters": [
+          {
+            "name": "vehicleId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VehiclePatchRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/VehicleDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/dispatch/orders/{orderId}": {
+      "get": {
+        "tags": [
+          "Delivery Orders"
+        ],
+        "summary": "Get one order",
+        "operationId": "getOrder",
+        "parameters": [
+          {
+            "name": "orderId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrderDto"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Delivery Orders"
+        ],
+        "summary": "Replace an existing order",
+        "operationId": "replaceOrder",
+        "parameters": [
+          {
+            "name": "orderId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OrderRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrderDto"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Delivery Orders"
+        ],
+        "summary": "Delete one order",
+        "operationId": "deleteOrder",
+        "parameters": [
+          {
+            "name": "orderId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Delivery Orders"
+        ],
+        "summary": "Partially update an order",
+        "operationId": "patchOrder",
+        "parameters": [
+          {
+            "name": "orderId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OrderPatchRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrderDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/dispatch/vehicles": {
+      "get": {
+        "tags": [
+          "Fleet"
+        ],
+        "summary": "Search stored vehicles (filter, sort, page)",
+        "operationId": "listVehicles",
+        "parameters": [
+          {
+            "name": "minCapacity",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "format": "double"
+            }
+          },
+          {
+            "name": "maxCapacity",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "format": "double"
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Zero-based page index (0..N)",
+            "required": false,
+            "schema": {
+              "minimum": 0,
+              "type": "integer",
+              "default": 0
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "description": "The size of the page to be returned",
+            "required": false,
+            "schema": {
+              "minimum": 1,
+              "type": "integer",
+              "default": 20
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "description": "Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
+            "required": false,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "default": [
+                "vehicleId,ASC"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PageResponseVehicleDto"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Fleet"
+        ],
+        "summary": "Submit fleet details (upsert by vehicleId)",
+        "operationId": "submitVehicles",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VehicleBatchRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/dispatch/plans": {
+      "get": {
+        "tags": [
+          "Plan History"
+        ],
+        "summary": "List saved plans (newest first by default)",
+        "operationId": "listPlans",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Zero-based page index (0..N)",
+            "required": false,
+            "schema": {
+              "minimum": 0,
+              "type": "integer",
+              "default": 0
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "description": "The size of the page to be returned",
+            "required": false,
+            "schema": {
+              "minimum": 1,
+              "type": "integer",
+              "default": 20
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "description": "Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
+            "required": false,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "default": [
+                "createdAt,DESC"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PageResponsePlanMetadataDto"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Plan History"
+        ],
+        "summary": "Generate a plan from the stored orders/vehicles and save it",
+        "operationId": "createPlan",
+        "parameters": [
+          {
+            "name": "strategy",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlanDetailResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/dispatch/orders": {
+      "get": {
+        "tags": [
+          "Delivery Orders"
+        ],
+        "summary": "Search stored orders (filter, sort, page)",
+        "operationId": "listOrders",
+        "parameters": [
+          {
+            "name": "priority",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "HIGH",
+                "MEDIUM",
+                "LOW"
+              ]
+            }
+          },
+          {
+            "name": "minWeight",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "format": "double"
+            }
+          },
+          {
+            "name": "maxWeight",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "format": "double"
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Zero-based page index (0..N)",
+            "required": false,
+            "schema": {
+              "minimum": 0,
+              "type": "integer",
+              "default": 0
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "description": "The size of the page to be returned",
+            "required": false,
+            "schema": {
+              "minimum": 1,
+              "type": "integer",
+              "default": 20
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "description": "Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
+            "required": false,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "default": [
+                "orderId,ASC"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PageResponseOrderDto"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Delivery Orders"
+        ],
+        "summary": "Submit delivery orders (upsert by orderId)",
+        "operationId": "submitOrders",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OrderBatchRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/dispatch/strategies": {
+      "get": {
+        "tags": [
+          "Dispatch Plan"
+        ],
+        "summary": "List the available allocation strategies",
+        "operationId": "listStrategies",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/StrategyDto"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/dispatch/plans/{planId}/summary": {
+      "get": {
+        "tags": [
+          "Plan History"
+        ],
+        "summary": "KPIs for a saved plan: utilization, assignment rate, distance, idle vehicles",
+        "operationId": "getSummary",
+        "parameters": [
+          {
+            "name": "planId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlanSummaryResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/dispatch/plans/{planId}": {
+      "get": {
+        "tags": [
+          "Plan History"
+        ],
+        "summary": "Get one saved plan with its full assignments",
+        "operationId": "getPlan",
+        "parameters": [
+          {
+            "name": "planId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlanDetailResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Plan History"
+        ],
+        "summary": "Delete a saved plan",
+        "operationId": "deletePlan",
+        "parameters": [
+          {
+            "name": "planId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/v1/dispatch/plan": {
+      "get": {
+        "tags": [
+          "Dispatch Plan"
+        ],
+        "summary": "Compute the dispatch plan from stored orders and vehicles (not persisted)",
+        "operationId": "getPlan_1",
+        "parameters": [
+          {
+            "name": "strategy",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/DispatchPlanResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/dispatch/reset": {
+      "delete": {
+        "tags": [
+          "Dispatch Plan"
+        ],
+        "summary": "Delete all stored orders and vehicles (and optionally plan history)",
+        "operationId": "reset",
+        "parameters": [
+          {
+            "name": "includePlans",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "VehicleRequest": {
+        "required": [
+          "capacity",
+          "currentAddress",
+          "currentLatitude",
+          "currentLongitude",
+          "vehicleId"
+        ],
+        "type": "object",
+        "properties": {
+          "vehicleId": {
+            "maxLength": 64,
+            "minLength": 0,
+            "pattern": "^[A-Za-z0-9._-]*$",
+            "type": "string",
+            "description": "Unique vehicle id",
+            "example": "VEH001"
+          },
+          "capacity": {
+            "type": "number",
+            "description": "Maximum total load the vehicle can carry",
+            "format": "double",
+            "example": 100
+          },
+          "currentLatitude": {
+            "maximum": 90,
+            "exclusiveMaximum": false,
+            "minimum": -90,
+            "exclusiveMinimum": false,
+            "type": "number",
+            "description": "Current latitude (-90 to 90)",
+            "format": "double",
+            "example": 12.9716
+          },
+          "currentLongitude": {
+            "maximum": 180,
+            "exclusiveMaximum": false,
+            "minimum": -180,
+            "exclusiveMinimum": false,
+            "type": "number",
+            "description": "Current longitude (-180 to 180)",
+            "format": "double",
+            "example": 77.6413
+          },
+          "currentAddress": {
+            "maxLength": 255,
+            "minLength": 0,
+            "type": "string",
+            "example": "Indiranagar, Bangalore, Karnataka, India"
+          }
+        }
+      },
+      "VehicleDto": {
+        "type": "object",
+        "properties": {
+          "vehicleId": {
+            "type": "string"
+          },
+          "capacity": {
+            "type": "number",
+            "format": "double"
+          },
+          "currentLatitude": {
+            "type": "number",
+            "format": "double"
+          },
+          "currentLongitude": {
+            "type": "number",
+            "format": "double"
+          },
+          "currentAddress": {
+            "type": "string"
+          }
+        }
+      },
+      "OrderRequest": {
+        "required": [
+          "address",
+          "latitude",
+          "longitude",
+          "orderId",
+          "packageWeight",
+          "priority"
+        ],
+        "type": "object",
+        "properties": {
+          "orderId": {
+            "maxLength": 64,
+            "minLength": 0,
+            "pattern": "^[A-Za-z0-9._-]*$",
+            "type": "string",
+            "description": "Unique order id",
+            "example": "ORD001"
+          },
+          "latitude": {
+            "maximum": 90,
+            "exclusiveMaximum": false,
+            "minimum": -90,
+            "exclusiveMinimum": false,
+            "type": "number",
+            "description": "Drop-point latitude (-90 to 90)",
+            "format": "double",
+            "example": 12.9716
+          },
+          "longitude": {
+            "maximum": 180,
+            "exclusiveMaximum": false,
+            "minimum": -180,
+            "exclusiveMinimum": false,
+            "type": "number",
+            "description": "Drop-point longitude (-180 to 180)",
+            "format": "double",
+            "example": 77.5946
+          },
+          "address": {
+            "maxLength": 255,
+            "minLength": 0,
+            "type": "string",
+            "example": "MG Road, Bangalore, Karnataka, India"
+          },
+          "packageWeight": {
+            "type": "number",
+            "description": "Package weight, same unit as vehicle capacity",
+            "format": "double",
+            "example": 10
+          },
+          "priority": {
+            "type": "string",
+            "example": "HIGH",
+            "enum": [
+              "HIGH",
+              "MEDIUM",
+              "LOW"
+            ]
+          }
+        }
+      },
+      "OrderDto": {
+        "type": "object",
+        "properties": {
+          "orderId": {
+            "type": "string"
+          },
+          "latitude": {
+            "type": "number",
+            "format": "double"
+          },
+          "longitude": {
+            "type": "number",
+            "format": "double"
+          },
+          "address": {
+            "type": "string"
+          },
+          "packageWeight": {
+            "type": "number",
+            "format": "double"
+          },
+          "priority": {
+            "type": "string",
+            "enum": [
+              "HIGH",
+              "MEDIUM",
+              "LOW"
+            ]
+          }
+        }
+      },
+      "VehicleBatchRequest": {
+        "required": [
+          "vehicles"
+        ],
+        "type": "object",
+        "properties": {
+          "vehicles": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/VehicleRequest"
+            }
+          }
+        }
+      },
+      "ApiResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          }
+        }
+      },
+      "AssignedVehicleDto": {
+        "type": "object",
+        "properties": {
+          "vehicleId": {
+            "type": "string"
+          },
+          "capacity": {
+            "type": "number",
+            "format": "double"
+          },
+          "totalLoad": {
+            "type": "number",
+            "format": "double"
+          },
+          "totalDistance": {
+            "type": "string"
+          },
+          "totalDistanceKm": {
+            "type": "number",
+            "format": "double"
+          },
+          "assignedOrders": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OrderDto"
+            }
+          }
+        }
+      },
+      "DispatchPlanResponse": {
+        "type": "object",
+        "properties": {
+          "dispatchPlan": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AssignedVehicleDto"
+            }
+          },
+          "unassignedOrders": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UnassignedOrderDto"
+            }
+          }
+        }
+      },
+      "PlanDetailResponse": {
+        "type": "object",
+        "properties": {
+          "metadata": {
+            "$ref": "#/components/schemas/PlanMetadataDto"
+          },
+          "plan": {
+            "$ref": "#/components/schemas/DispatchPlanResponse"
+          }
+        }
+      },
+      "PlanMetadataDto": {
+        "type": "object",
+        "properties": {
+          "planId": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "strategy": {
+            "type": "string"
+          },
+          "totalOrders": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "assignedOrders": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "unassignedOrders": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalDistanceKm": {
+            "type": "number",
+            "format": "double"
+          },
+          "fleetUtilizationPercent": {
+            "type": "number",
+            "format": "double"
+          },
+          "computationMillis": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "UnassignedOrderDto": {
+        "type": "object",
+        "properties": {
+          "order": {
+            "$ref": "#/components/schemas/OrderDto"
+          },
+          "reason": {
+            "type": "string"
+          }
+        }
+      },
+      "OrderBatchRequest": {
+        "required": [
+          "orders"
+        ],
+        "type": "object",
+        "properties": {
+          "orders": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OrderRequest"
+            }
+          }
+        }
+      },
+      "VehiclePatchRequest": {
+        "type": "object",
+        "properties": {
+          "capacity": {
+            "type": "number",
+            "format": "double"
+          },
+          "currentLatitude": {
+            "maximum": 90,
+            "exclusiveMaximum": false,
+            "minimum": -90,
+            "exclusiveMinimum": false,
+            "type": "number",
+            "format": "double"
+          },
+          "currentLongitude": {
+            "maximum": 180,
+            "exclusiveMaximum": false,
+            "minimum": -180,
+            "exclusiveMinimum": false,
+            "type": "number",
+            "format": "double"
+          },
+          "currentAddress": {
+            "maxLength": 255,
+            "minLength": 0,
+            "pattern": ".*\\S.*",
+            "type": "string"
+          }
+        }
+      },
+      "OrderPatchRequest": {
+        "type": "object",
+        "properties": {
+          "latitude": {
+            "maximum": 90,
+            "exclusiveMaximum": false,
+            "minimum": -90,
+            "exclusiveMinimum": false,
+            "type": "number",
+            "format": "double"
+          },
+          "longitude": {
+            "maximum": 180,
+            "exclusiveMaximum": false,
+            "minimum": -180,
+            "exclusiveMinimum": false,
+            "type": "number",
+            "format": "double"
+          },
+          "address": {
+            "maxLength": 255,
+            "minLength": 0,
+            "pattern": ".*\\S.*",
+            "type": "string"
+          },
+          "packageWeight": {
+            "type": "number",
+            "format": "double"
+          },
+          "priority": {
+            "type": "string",
+            "enum": [
+              "HIGH",
+              "MEDIUM",
+              "LOW"
+            ]
+          }
+        }
+      },
+      "PageResponseVehicleDto": {
+        "type": "object",
+        "properties": {
+          "content": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/VehicleDto"
+            }
+          },
+          "page": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "size": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalElements": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "totalPages": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "StrategyDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "defaultStrategy": {
+            "type": "boolean"
+          }
+        }
+      },
+      "PlanStatistics": {
+        "type": "object",
+        "properties": {
+          "totalOrders": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "assignedOrders": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "unassignedOrders": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "assignmentRatePercent": {
+            "type": "number",
+            "format": "double"
+          },
+          "assignedWeight": {
+            "type": "number",
+            "format": "double"
+          },
+          "fleetCapacity": {
+            "type": "number",
+            "format": "double"
+          },
+          "fleetUtilizationPercent": {
+            "type": "number",
+            "format": "double"
+          },
+          "totalDistanceKm": {
+            "type": "number",
+            "format": "double"
+          },
+          "vehiclesUsed": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "vehiclesIdle": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "unassignedByPriority": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          "vehicles": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/VehicleStatistics"
+            }
+          }
+        }
+      },
+      "PlanSummaryResponse": {
+        "type": "object",
+        "properties": {
+          "planId": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "strategy": {
+            "type": "string"
+          },
+          "computationMillis": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "statistics": {
+            "$ref": "#/components/schemas/PlanStatistics"
+          }
+        }
+      },
+      "VehicleStatistics": {
+        "type": "object",
+        "properties": {
+          "vehicleId": {
+            "type": "string"
+          },
+          "capacity": {
+            "type": "number",
+            "format": "double"
+          },
+          "totalLoad": {
+            "type": "number",
+            "format": "double"
+          },
+          "utilizationPercent": {
+            "type": "number",
+            "format": "double"
+          },
+          "stops": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "distanceKm": {
+            "type": "number",
+            "format": "double"
+          }
+        }
+      },
+      "PageResponsePlanMetadataDto": {
+        "type": "object",
+        "properties": {
+          "content": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PlanMetadataDto"
+            }
+          },
+          "page": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "size": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalElements": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "totalPages": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "PageResponseOrderDto": {
+        "type": "object",
+        "properties": {
+          "content": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OrderDto"
+            }
+          },
+          "page": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "size": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalElements": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "totalPages": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      }
+    }
+  }
 }
