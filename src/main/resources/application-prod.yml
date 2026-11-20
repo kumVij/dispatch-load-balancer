@@ -1,0 +1,8 @@
+# Used for the public deployment: SPRING_PROFILES_ACTIVE=prod
+spring:
+  h2:
+    console:
+      enabled: false     # never expose the H2 console on the internet
+
+app:
+  seed-demo-data: true   # in-memory data is empty after every restart, so reload the sample data

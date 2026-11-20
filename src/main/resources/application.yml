@@ -1,0 +1,59 @@
+spring:
+  application:
+    name: dispatch-load-balancer
+  datasource:
+    url: jdbc:h2:mem:dispatchdb;DB_CLOSE_DELAY=-1
+    username: sa
+    password:
+  jpa:
+    hibernate:
+      ddl-auto: none        # schema is owned by Flyway (src/main/resources/db/migration)
+    open-in-view: false
+  flyway:
+    enabled: true
+  data:
+    web:
+      pageable:
+        default-page-size: 20
+        max-page-size: 100
+  h2:
+    console:
+      enabled: true
+
+server:
+  port: ${PORT:8080}                  # hosting platforms (Render, Railway, ...) inject PORT
+  forward-headers-strategy: framework # honour X-Forwarded-* so Swagger builds https URLs behind a proxy
+
+app:
+  seed-demo-data: ${SEED_DEMO_DATA:false}   # load the 30 sample orders + 5 vehicles at start-up
+
+springdoc:
+  paths-to-match: /api/v1/**
+  swagger-ui:
+    path: /swagger-ui.html
+    operations-sorter: method
+    tags-sorter: alpha
+    display-request-duration: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: always
+      probes:
+        enabled: true
+  metrics:
+    tags:
+      application: ${spring.application.name}
+
+info:
+  app:
+    name: Dispatch Load Balancer
+    description: Assigns delivery orders to a vehicle fleet by priority, capacity and distance
+
+logging:
+  pattern:
+    level: "%5p [cid=%X{correlationId:-}]"
