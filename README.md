@@ -8,11 +8,11 @@ computed plan can be saved, and the service ships with health checks, metrics, C
 
 | | Link |
 |---|---|
-| Live application | `https://<YOUR-SERVICE>.onrender.com` |
-| Swagger UI (interactive API docs) | `https://<YOUR-SERVICE>.onrender.com/swagger-ui.html` |
-| OpenAPI spec | `https://<YOUR-SERVICE>.onrender.com/v3/api-docs` (also saved as `docs/openapi.json`) |
-| Health check | `https://<YOUR-SERVICE>.onrender.com/actuator/health` |
-| Video walkthrough (Loom) | `<YOUR-LOOM-LINK>` |
+| Live application | `https://dispatch-load-balancer-q6wh.onrender.com`|
+| Swagger UI (interactive API docs) | `https://dispatch-load-balancer-q6wh.onrender.com/swagger-ui/index.html` |
+| OpenAPI spec | `https://dispatch-load-balancer-q6wh.onrender.com/v3/api-docs` (also saved as `docs/openapi.json`) |
+| Health check | `https://dispatch-load-balancer-q6wh.onrender.com/actuator/health` |
+| Video walkthrough (Loom) | `"D:\new-assesment\Recording 2026-11-20 211522.mp4"` |
 
 > The free hosting tier sleeps after about 15 minutes without traffic, so the first request can take up to a minute.
 > The sample data (30 orders, 5 vehicles) is loaded automatically on start-up.
